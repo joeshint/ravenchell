@@ -35,6 +35,16 @@ export const PUBLIC_STATUSES = {
 const escapeLike = (s) => s.replace(/[\\%_]/g, (c) => `\\${c}`);
 
 /**
+ * A complete reference number in canonical form, or null. The database
+ * zero-pads the sequence to 6 digits (LST-2026-000042), so "lst-2026-42"
+ * must be padded before an exact match.
+ */
+export function normalizeReference(term) {
+  const m = /^(LST|FND|CLM)-(\d{4})-(\d{1,6})$/i.exec(term?.trim() ?? '');
+  return m ? `${m[1].toUpperCase()}-${m[2]}-${m[3].padStart(6, '0')}` : null;
+}
+
+/**
  * Public listing with search, filters, sorting and pagination.
  * Returns { rows, total }.
  */
@@ -52,9 +62,8 @@ export async function listItems(
 
   const term = q?.trim();
   if (term) {
-    query = /^(LST|FND)-\d{4}-\d{1,6}$/i.test(term)
-      ? query.eq('reference_no', term.toUpperCase())
-      : query.ilike('item_name', `%${escapeLike(term)}%`);
+    const ref = normalizeReference(term);
+    query = ref ? query.eq('reference_no', ref) : query.ilike('item_name', `%${escapeLike(term)}%`);
   }
   if (category) query = query.eq('category_id', category);
   if (campus) query = query.eq('campus_id', campus);

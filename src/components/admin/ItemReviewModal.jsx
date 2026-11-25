@@ -156,8 +156,8 @@ export function ItemReviewModal({ type, item, onClose }) {
                   <dt className="text-xs text-slate-500">Verification questions</dt>
                   <dd>
                     <ol className="list-decimal pl-5 text-sm text-slate-800">
-                      {item.verification_questions.map((q) => (
-                        <li key={q}>{q}</li>
+                      {item.verification_questions.map((q, i) => (
+                        <li key={i}>{q}</li>
                       ))}
                     </ol>
                   </dd>

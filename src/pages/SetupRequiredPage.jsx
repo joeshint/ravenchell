@@ -1,7 +1,23 @@
 import { Database } from 'lucide-react';
+import { supabaseConfigError } from '@/lib/supabase';
 
-/** Shown instead of the app when the Supabase environment variables are missing. */
+/** Shown instead of the app when the Supabase environment variables are missing or malformed. */
 export default function SetupRequiredPage() {
+  if (supabaseConfigError) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-slate-50 px-4">
+        <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-8 shadow-card">
+          <div className="mb-5 flex size-12 items-center justify-center rounded-full bg-amber-50">
+            <Database className="size-6 text-amber-600" />
+          </div>
+          <h1 className="text-xl font-semibold text-slate-900">Fix the Supabase settings</h1>
+          <p className="mt-2 text-sm text-slate-600">{supabaseConfigError}</p>
+          <p className="mt-4 text-sm text-slate-600">Save the file, then restart the dev server.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-dvh items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-8 shadow-card">

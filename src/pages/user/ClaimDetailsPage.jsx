@@ -135,8 +135,8 @@ export default function ClaimDetailsPage() {
               </div>
               {answers.length > 0 && (
                 <dl className="space-y-3">
-                  {answers.map((a) => (
-                    <div key={a.question}>
+                  {answers.map((a, i) => (
+                    <div key={i}>
                       <dt className="text-xs font-medium text-slate-500">{a.question}</dt>
                       <dd className="text-sm text-slate-800">{a.answer}</dd>
                     </div>

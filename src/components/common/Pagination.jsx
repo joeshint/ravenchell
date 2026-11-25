@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
@@ -16,7 +17,13 @@ function pageList(current, total) {
 /** 1-based pagination with a "Showing x–y of z" summary. */
 export function Pagination({ page, pageSize, total, onPageChange, className }) {
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  if (total === 0) return null;
+  // Past the last page (stale link, or rows removed since): move to the last one.
+  const outOfRange = total > 0 && page > totalPages;
+  useEffect(() => {
+    if (outOfRange) onPageChange(totalPages);
+  }, [outOfRange, totalPages, onPageChange]);
+
+  if (total === 0 || outOfRange) return null;
   const from = (page - 1) * pageSize + 1;
   const to = Math.min(page * pageSize, total);
 

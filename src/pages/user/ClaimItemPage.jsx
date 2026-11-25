@@ -70,7 +70,7 @@ function ClaimForm({ item, onSubmitted }) {
           </FormField>
 
           {questions.map((q, i) => (
-            <FormField key={q} label={q} error={errors.answers?.[i]?.message} required>
+            <FormField key={i} label={q} error={errors.answers?.[i]?.message} required>
               <Input {...register(`answers.${i}`)} />
             </FormField>
           ))}

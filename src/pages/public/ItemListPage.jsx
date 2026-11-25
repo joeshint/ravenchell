@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { PackageCheck, PackageSearch, Plus } from 'lucide-react';
 import { useItemList } from '@/hooks/useItems';
@@ -57,6 +57,15 @@ export default function ItemListPage({ type }) {
     },
     [setParams],
   );
+
+  // A stale link (or items removed since) can point past the last page:
+  // jump to the last page that has results instead of showing "no items".
+  const lastPage = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1;
+  useEffect(() => {
+    if (data && !isPlaceholderData && data.total > 0 && page > lastPage) {
+      updateFilters({ page: lastPage > 1 ? String(lastPage) : '' }, { keepPage: true });
+    }
+  }, [data, isPlaceholderData, page, lastPage, updateFilters]);
 
   const resetFilters = () => {
     setParams(filters.view ? { view: filters.view } : {}, { replace: true });

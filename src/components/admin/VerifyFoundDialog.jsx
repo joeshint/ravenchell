@@ -28,7 +28,10 @@ export function VerifyFoundDialog({ open, onClose, item, privateDetails, onConfi
   const custodyOptions = locations.filter((l) => l.is_custody_point || l.id === item.custody_location_id);
 
   const update = (i, v) => setQuestions((qs) => qs.map((q, j) => (j === i ? v : q)));
-  const filled = questions.map((q) => q.trim()).filter(Boolean);
+  // Trimmed, non-empty and without (case-insensitive) duplicates.
+  const filled = questions
+    .map((q) => q.trim())
+    .filter((q, i, all) => q && all.findIndex((o) => o.toLowerCase() === q.toLowerCase()) === i);
 
   return (
     <Modal

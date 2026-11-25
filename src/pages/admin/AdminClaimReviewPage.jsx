@@ -195,8 +195,8 @@ export default function AdminClaimReviewPage() {
               <div className="space-y-4">
                 <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">Claimant says</p>
                 <Field label="Ownership description">{claim.ownership_description}</Field>
-                {answers.map((a) => (
-                  <Field key={a.question} label={a.question}>
+                {answers.map((a, i) => (
+                  <Field key={i} label={a.question}>
                     {a.answer}
                   </Field>
                 ))}

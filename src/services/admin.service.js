@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { normalizeReference } from './items.service';
 
 /**
  * Admin data access. Every call relies on the admin RLS policies and on the
@@ -54,9 +55,10 @@ export async function listAdminItems(type, { q, status, campus, category, page =
   if (category) query = query.eq('category_id', category);
   const term = q?.trim();
   if (term) {
-    query = /^(LST|FND)-/i.test(term)
-      ? query.ilike('reference_no', `${escapeLike(term.toUpperCase())}%`)
-      : query.ilike('item_name', `%${escapeLike(term)}%`);
+    const ref = normalizeReference(term);
+    if (ref) query = query.eq('reference_no', ref);
+    else if (/^(LST|FND)-/i.test(term)) query = query.ilike('reference_no', `${escapeLike(term.toUpperCase())}%`);
+    else query = query.ilike('item_name', `%${escapeLike(term)}%`);
   }
   // Oldest pending first is the natural moderation queue; otherwise newest first.
   query = query.order('created_at', { ascending: status === 'pending' || status === 'pending_verification' });
@@ -111,7 +113,12 @@ export async function listClaims({ q, status, page = 1 } = {}) {
   let query = supabase.from('claim_requests').select(CLAIM_LIST_COLUMNS, { count: 'exact' });
   if (status) query = query.eq('status', status);
   const term = q?.trim();
-  if (term) query = query.ilike('reference_no', `%${escapeLike(term.toUpperCase())}%`);
+  if (term) {
+    const ref = normalizeReference(term);
+    query = ref
+      ? query.eq('reference_no', ref)
+      : query.ilike('reference_no', `%${escapeLike(term.toUpperCase())}%`);
+  }
   query = query.order('created_at', { ascending: status === 'pending' });
   return run(paged(query, page));
 }
